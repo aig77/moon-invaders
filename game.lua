@@ -19,9 +19,11 @@ local function new_game_state()
     },
     enemy = {
       units = {
-        icon = "👾",
-        x = math.floor(cols / 2),
-        y = math.floor(rows / 4),
+        {
+          icon = "👾",
+          x = math.floor(cols / 2),
+          y = math.floor(rows / 4),
+        },
       }
     },
     collision = "💥",
@@ -61,23 +63,31 @@ local function draw_enemy_units(state)
         unit.y, unit.x
       ) .. unit.icon)
   end
-  write(
-
-  )
 end
 
 
 local function draw_lasers(state)
   local frame = state.frame
   local laser = state.char.laser
+  local units = state.enemy.units
   local remove = {}
   for i = 1, #laser.beams do
-    if laser.beams[i].y < 5 then
+    local beam = laser.beams[i]
+
+    if beam.y < 5 then
       remove[#remove + 1] = i
     end
 
+    for j = 1, #units do
+      local unit = units[j]
+      if beam.x == unit.x and beam.y == unit.y then
+        remove[#remove + 1] = i
+        unit.icon = state.collision
+      end
+    end
+
     if frame % 4 == 0 then
-      laser.beams[i].y = laser.beams[i].y - 1
+      beam.y = beam.y - 1
     end
 
     write(
